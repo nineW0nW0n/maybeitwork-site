@@ -1,6 +1,7 @@
 # skills.md — which skill, when
 
-Five skills are installed for this project.
+Three skills are installed for this project (two others, `brand-guidelines`
+and `theme-factory`, turned out not to apply — see below).
 
 > **Verify this file before trusting it.** The mapping below is inferred
 > from skill *names*, not from reading the skills themselves — they
@@ -9,52 +10,61 @@ Five skills are installed for this project.
 > conditions, and if reality differs from this file, correct this file in
 > the same turn and say what changed.
 
-## The five
+## The five (as originally installed)
 
 | Skill | Assumed purpose | Stage |
 |---|---|---|
 | `find-skills` | Discovery — what exists, what each actually does | first, once |
-| `brand-guidelines` | Identity: voice, personality, brand rules | 1 |
-| `theme-factory` | Design tokens: palette, type scale, spacing, motion timing | 2 |
-| `frontend-design` | Layout, hierarchy, component and motion design quality | 3 |
-| `web-artifacts-builder` | Assembling the self-contained HTML artifact | 4 |
+| ~~`brand-guidelines`~~ | **Wrong fit (corrected 2026-08-15).** This is Anthropic's own corporate color/font kit for docs and slides — it applies *Anthropic's* brand, not a tool for defining a project's own voice. Not useful here. | skip |
+| ~~`theme-factory`~~ | **Wrong fit (corrected 2026-08-15).** 10 canned presets for slide decks (Ocean Depths, Sunset Boulevard, ...) — not a token generator. We have real tokens already (see below). Not useful here. | skip |
+| `frontend-design` | Layout, hierarchy, component and motion design quality | 1 |
+| `web-artifacts-builder` | Assembling the self-contained HTML artifact | 2 |
+
+Identity is already written down in `CLAUDE.md`'s Brand line — self-aware,
+playful, faintly uncertain, never corporate, the domain as the joke.
+
+Tokens are already specified in the design handoff (`maybeit-work-design-spec.md`
+/ the zip README, gitignored, kept local) — exact hex values for light/dark,
+Inter + IBM Plex Mono, spacing, and a beat-by-beat motion timing table. That
+handoff *is* the theme-factory output for this project; don't run a preset
+picker over it.
 
 ## The pipeline — full build or full redesign only
 
 Run in order. Each stage's output is the next stage's input. This is the
 nesting case Ex asked about — it applies here and mostly nowhere else.
 
-1. **`find-skills`** — confirm the four below do what this file claims.
-   Once per project, not per task.
-2. **`brand-guidelines`** — establish identity before any visual work.
-   The brand is the wordplay: `maybeit.work` / "maybe it works."
-   Self-aware, playful, faintly uncertain, never corporate. Everything
-   downstream expresses this, so don't skip ahead to colours.
-3. **`theme-factory`** — turn that identity into tokens: colour scale,
-   type scale, spacing rhythm, and motion timing. Durations and easing
-   curves are design decisions here, not defaults chosen later in code.
-4. **`frontend-design`** — design the actual sections using those tokens.
+0. **`find-skills`** — confirm the two real skills below do what this
+   file claims. Once per project, not per task.
+1. **Identity** (no skill) — the wordplay `maybeit.work` / "maybe it
+   works," self-aware, playful, faintly uncertain, never corporate.
+   Already settled in `CLAUDE.md`.
+2. **Tokens** (no skill) — colour scale, type scale, spacing, motion
+   timing. Already settled in the design handoff doc, confirm with Ex
+   only where it's ambiguous (e.g. the canvas-vs-rail call already made).
+3. **`frontend-design`** — design the actual sections using those tokens.
    Layout, hierarchy, what moves, why it moves, and in what order.
-5. **`web-artifacts-builder`** — assemble into the single self-contained
+4. **`web-artifacts-builder`** — assemble into the single self-contained
    `index.html`. This is construction; the design decisions should
    already be settled before it runs.
 
-Pass each stage's output forward explicitly. Don't let stage 4 re-invent
-a palette stage 3 already produced — that's how a pipeline quietly stops
+Pass each stage's output forward explicitly. Don't let stage 3 re-invent
+a palette stage 2 already produced — that's how a pipeline quietly stops
 being a pipeline.
 
 ## When NOT to run the pipeline
 
-Most tasks are not a full build. Running five skills to change a button
-colour wastes tokens and reopens decisions that were already settled.
+Most tasks are not a full build. Running the whole pipeline to change a
+button colour wastes tokens and reopens decisions that were already
+settled.
 
 | Task | Use |
 |---|---|
 | Copy edit, typo, wording | none |
 | Tweak one animation's duration or easing | none — the tokens exist |
 | Add a section in the established style | `frontend-design` only |
-| Change the palette or type scale | `theme-factory`, then apply forward |
-| Rethink voice, naming, personality | `brand-guidelines`, then forward |
+| Change the palette or type scale | edit the tokens directly, then apply forward |
+| Rethink voice, naming, personality | edit `CLAUDE.md`'s Brand line, then apply forward |
 | Rebuild or restructure the whole page | full pipeline |
 | Genuinely unsure which applies | `find-skills` |
 
