@@ -1,0 +1,6 @@
+.DS_Store
+
+# design handoff / reference material — not site source, kept local only
+media/
+*.zip
+maybeit-work-design-spec.md
