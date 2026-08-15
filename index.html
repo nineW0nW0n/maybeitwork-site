@@ -86,7 +86,7 @@ html.js .no-js { display: none !important; }
     <h1 style="font-size: clamp(32px, 8vw, 48px); font-weight: 600; letter-spacing: -.02em; margin: 0; color: var(--ink)">maybeit.work</h1>
     <p style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink3); margin: 0;">it does.</p>
     <ul style="list-style: none; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 16px; padding: 0; margin: 0; font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: .08em; color: var(--ink3);">
-      <li>SITE</li><li>VPS01</li><li>VPS02</li><li>VPS03</li>
+      <li>DOKPLOY</li><li>VPS00</li><li>VPS01</li><li>VPS02</li>
     </ul>
   </div>
 
@@ -117,10 +117,10 @@ html.js .no-js { display: none !important; }
           <span id="theme-toggle" class="theme-toggle" style="display: flex; gap: 6px; align-items: center; letter-spacing: .12em"><span id="tl" style="opacity: .45">LGT</span><span style="opacity: .28">/</span><span id="td" style="opacity: .45">DRK</span></span>
         </span>
         <div style="display: flex; flex-wrap: wrap; column-gap: clamp(12px, 2.4vw, 34px); row-gap: 4px; align-items: center; justify-content: center; min-width: 0">
-          <span style="display: flex; gap: 9px; align-items: center"><span id="d0" class="status-dot" style="background: var(--ink3); opacity: .5"></span>SITE<span id="v0" style="opacity: .55; min-width: 5.6em; display: inline-block">UNKWN</span></span>
-          <span style="display: flex; gap: 9px; align-items: center"><span id="d1" class="status-dot" style="background: var(--ink3); opacity: .5"></span>VPS01<span id="v1" style="opacity: .55; min-width: 5.6em; display: inline-block">UNKWN</span></span>
-          <span style="display: flex; gap: 9px; align-items: center"><span id="d2" class="status-dot" style="background: var(--ink3); opacity: .5"></span>VPS02<span id="v2" style="opacity: .55; min-width: 5.6em; display: inline-block">UNKWN</span></span>
-          <span style="display: flex; gap: 9px; align-items: center"><span id="d3" class="status-dot" style="background: var(--ink3); opacity: .5"></span>VPS03<span id="v3" style="opacity: .55; min-width: 5.6em; display: inline-block">UNKWN</span></span>
+          <span style="display: flex; gap: 9px; align-items: center"><span id="d0" class="status-dot" style="background: var(--ink3); opacity: .5"></span>DOKPLOY<span id="v0" style="opacity: .55; min-width: 5.6em; display: inline-block">UNKWN</span></span>
+          <span style="display: flex; gap: 9px; align-items: center"><span id="d1" class="status-dot" style="background: var(--ink3); opacity: .5"></span>VPS00<span id="v1" style="opacity: .55; min-width: 5.6em; display: inline-block">UNKWN</span></span>
+          <span style="display: flex; gap: 9px; align-items: center"><span id="d2" class="status-dot" style="background: var(--ink3); opacity: .5"></span>VPS01<span id="v2" style="opacity: .55; min-width: 5.6em; display: inline-block">UNKWN</span></span>
+          <span style="display: flex; gap: 9px; align-items: center"><span id="d3" class="status-dot" style="background: var(--ink3); opacity: .5"></span>VPS02<span id="v3" style="opacity: .55; min-width: 5.6em; display: inline-block">UNKWN</span></span>
         </div>
         <span style="text-align: right; display: flex; justify-content: flex-end; gap: clamp(10px, 1.8vw, 22px); align-items: center; min-width: 0">
           <span id="replay" class="replay-btn">REPLAY</span>
@@ -154,10 +154,10 @@ html.js .no-js { display: none !important; }
  * lands on the status hue; it turns bad only if some service is ok: false.
  * ──────────────────────────────────────────────────────────────────────── */
 const SERVICES = [
-  { name: 'SITE',  up: 99.98, ok: true },
-  { name: 'VPS01', up: 99.95, ok: true },
-  { name: 'VPS02', up: 99.91, ok: true },
-  { name: 'VPS03', up: 99.97, ok: true }
+  { name: 'DOKPLOY', up: 99.98, ok: true },
+  { name: 'VPS00', up: 99.95, ok: true },
+  { name: 'VPS01', up: 99.91, ok: true },
+  { name: 'VPS02', up: 99.97, ok: true }
 ];
 
 // Fixed constants — this build has no live tuning panel, so the prototype's
