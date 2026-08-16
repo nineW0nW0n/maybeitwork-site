@@ -1,3 +1,4 @@
+---
 name: ci
 
 on:
@@ -5,44 +6,52 @@ on:
     branches: [main]
   pull_request:
 
+# Read-only by default. No job here writes to the repo, and CI runs
+# third-party tooling, so the token it runs under gets nothing.
+permissions:
+  contents: read
+
 jobs:
   yamllint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4.4.0
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
         with:
-          python-version: "3.x"
-      - run: pip install yamllint
+          python-version: "3.12"
+      # Pinned exactly. An unpinned install runs whatever was published
+      # most recently, in a runner holding this repo's token.
+      - run: pip install yamllint==1.38.0
       - run: yamllint --strict .
 
   biome:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4.4.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020  # v4.4.0
         with:
           node-version: "22"
-      # covers standalone .js/.css/.json only — index.html's inline
-      # <style>/<script> are not parsed by biome, see rail-check below
-      - run: npx --yes @biomejs/biome ci .
+      # Version must match biome.json's $schema. Covers standalone
+      # .js/.css/.json only -- index.html's inline <style>/<script> are
+      # not parsed by biome, see the rails job below.
+      - run: npx --yes @biomejs/biome@2.5.8 ci .
 
   rails:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4.4.0
       - run: sh scripts/check-rails.sh
 
   html-validate:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4.4.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020  # v4.4.0
         with:
           node-version: "22"
       - run: |
           if [ -f index.html ]; then
-            npx --yes html-validate index.html
+            npx --yes html-validate@11.6.2 index.html
           else
             echo "no index.html yet — nothing to validate"
           fi
