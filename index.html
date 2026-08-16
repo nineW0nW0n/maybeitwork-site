@@ -198,7 +198,9 @@ let SERVICES = [
   try {
     const res = await fetch('/status.json', { signal: ctrl.signal });
     const data = await res.json();
-    const isNum = v => typeof v === 'number';
+    // Number.isFinite, not `typeof === 'number'` -- the latter accepts NaN
+    // and Infinity, which quant() then renders as the literal string "LNaN".
+    const isNum = v => Number.isFinite(v);
     const valid = Array.isArray(data) && data.length >= 1 && data.length <= 3 &&
       data.every(s => typeof s.name === 'string' &&
         isNum(s.load) && isNum(s.cpu) && isNum(s.mem) && isNum(s.swap) && isNum(s.disk));
