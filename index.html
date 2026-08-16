@@ -78,6 +78,31 @@ html.js .no-js { display: none !important; }
    script's chrome() method — same cutoff, two places, kept in sync by hand. */
 .hud-val { min-width: 11.5em; white-space: nowrap; display: inline-block; }
 @media (max-width: 600px) { .hud-val { min-width: 4.5em; } }
+
+/* Bottom bar: pct + theme-toggle on the left, vps status center, replay +
+   ST/00 on the right — one row wide, two rows narrow (theme-toggle and
+   replay drop under pct/vps/ST00 so they stop crowding it). Breakpoint
+   matches the `this.W < 600` check in the script, see .hud-val above. */
+#bar-row {
+  display: grid;
+  grid-template-columns: auto auto minmax(0,1fr) auto auto;
+  grid-template-areas: "pct theme vps replay st";
+  align-items: start;
+  column-gap: clamp(10px, 1.8vw, 22px);
+  row-gap: 6px;
+  padding-top: 14px;
+}
+#pct { grid-area: pct; }
+#theme-toggle { grid-area: theme; }
+#vps-cluster { grid-area: vps; }
+#replay { grid-area: replay; }
+#st-el { grid-area: st; }
+@media (max-width: 600px) {
+  #bar-row {
+    grid-template-columns: auto minmax(0,1fr) auto;
+    grid-template-areas: "pct vps st" "theme vps replay";
+  }
+}
 .replay-btn { cursor: pointer; opacity: .45; letter-spacing: .12em; transition: opacity .15s linear; }
 .replay-btn:hover { opacity: .9; }
 .theme-toggle { cursor: pointer; }
@@ -116,20 +141,16 @@ html.js .no-js { display: none !important; }
     <div id="bar" style="position: absolute; left: 0; right: 0; bottom: 0; padding: 0 40px 23px; opacity: 0; text-shadow: var(--hudText); transition: opacity .5s linear">
       <div style="height: 6px; background: repeating-linear-gradient(to right, var(--tick) 0px, var(--tick) 1px, transparent 1px, transparent 48px); margin-bottom: -1px; filter: var(--hudGlow)"></div>
       <div style="height: 1px; background: var(--rule); filter: var(--hudGlow)"></div>
-      <div style="display: grid; grid-template-columns: auto minmax(0,1fr) auto; align-items: start; padding-top: 14px; font-family: 'IBM Plex Mono', monospace; font-size: clamp(9.5px, 1.15vw, 12px); letter-spacing: .1em; color: var(--ink3); font-variant-numeric: tabular-nums">
-        <span style="display: flex; gap: clamp(10px, 1.8vw, 22px); align-items: center; min-width: 0">
-          <span id="pct">000%</span>
-          <span id="theme-toggle" class="theme-toggle" style="display: flex; gap: 6px; align-items: center; letter-spacing: .12em"><span id="tl" style="opacity: .45">LGT</span><span style="opacity: .28">/</span><span id="td" style="opacity: .45">DRK</span></span>
-        </span>
-        <div style="display: flex; flex-wrap: wrap; column-gap: clamp(12px, 2.4vw, 34px); row-gap: 4px; align-items: center; justify-content: center; min-width: 0">
+      <div id="bar-row" style="font-family: 'IBM Plex Mono', monospace; font-size: clamp(9.5px, 1.15vw, 12px); letter-spacing: .1em; color: var(--ink3); font-variant-numeric: tabular-nums">
+        <span id="pct" style="align-self: center">000%</span>
+        <span id="theme-toggle" class="theme-toggle" style="display: flex; gap: 6px; align-items: center; letter-spacing: .12em"><span id="tl" style="opacity: .45">LGT</span><span style="opacity: .28">/</span><span id="td" style="opacity: .45">DRK</span></span>
+        <div id="vps-cluster" style="display: flex; flex-wrap: wrap; column-gap: clamp(12px, 2.4vw, 34px); row-gap: 4px; align-items: center; justify-content: center; min-width: 0">
           <span style="display: flex; gap: 9px; align-items: center"><span id="d0" class="status-dot" style="background: var(--ink3); opacity: .5"></span>VPS00<span id="v0" class="hud-val" style="opacity: .55">--</span></span>
           <span style="display: flex; gap: 9px; align-items: center"><span id="d1" class="status-dot" style="background: var(--ink3); opacity: .5"></span>VPS01<span id="v1" class="hud-val" style="opacity: .55">--</span></span>
           <span style="display: flex; gap: 9px; align-items: center"><span id="d2" class="status-dot" style="background: var(--ink3); opacity: .5"></span>VPS02<span id="v2" class="hud-val" style="opacity: .55">--</span></span>
         </div>
-        <span style="text-align: right; display: flex; justify-content: flex-end; gap: clamp(10px, 1.8vw, 22px); align-items: center; min-width: 0">
-          <span id="replay" class="replay-btn">REPLAY</span>
-          <span style="opacity: .7">ST/00</span>
-        </span>
+        <span id="replay" class="replay-btn" style="justify-self: end">REPLAY</span>
+        <span id="st-el" style="opacity: .7; justify-self: end">ST/00</span>
       </div>
     </div>
   </div>
