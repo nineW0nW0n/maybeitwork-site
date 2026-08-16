@@ -73,6 +73,11 @@ html.js .no-js { display: none !important; }
   content: ''; position: absolute; inset: -4px; border-radius: 50%;
   background: inherit; filter: blur(3px); opacity: .3;
 }
+/* Width tracks the widest state each mode renders (5-metric readout vs
+   TAPPING/OK/DNGR). Breakpoint must match the `this.W < 600` check in the
+   script's chrome() method — same cutoff, two places, kept in sync by hand. */
+.hud-val { min-width: 11.5em; white-space: nowrap; display: inline-block; }
+@media (max-width: 600px) { .hud-val { min-width: 4.5em; } }
 .replay-btn { cursor: pointer; opacity: .45; letter-spacing: .12em; transition: opacity .15s linear; }
 .replay-btn:hover { opacity: .9; }
 .theme-toggle { cursor: pointer; }
@@ -117,9 +122,9 @@ html.js .no-js { display: none !important; }
           <span id="theme-toggle" class="theme-toggle" style="display: flex; gap: 6px; align-items: center; letter-spacing: .12em"><span id="tl" style="opacity: .45">LGT</span><span style="opacity: .28">/</span><span id="td" style="opacity: .45">DRK</span></span>
         </span>
         <div style="display: flex; flex-wrap: wrap; column-gap: clamp(12px, 2.4vw, 34px); row-gap: 4px; align-items: center; justify-content: center; min-width: 0">
-          <span style="display: flex; gap: 9px; align-items: center"><span id="d0" class="status-dot" style="background: var(--ink3); opacity: .5"></span>VPS00<span id="v0" style="opacity: .55; min-width: 11.5em; white-space: nowrap; display: inline-block">--</span></span>
-          <span style="display: flex; gap: 9px; align-items: center"><span id="d1" class="status-dot" style="background: var(--ink3); opacity: .5"></span>VPS01<span id="v1" style="opacity: .55; min-width: 11.5em; white-space: nowrap; display: inline-block">--</span></span>
-          <span style="display: flex; gap: 9px; align-items: center"><span id="d2" class="status-dot" style="background: var(--ink3); opacity: .5"></span>VPS02<span id="v2" style="opacity: .55; min-width: 11.5em; white-space: nowrap; display: inline-block">--</span></span>
+          <span style="display: flex; gap: 9px; align-items: center"><span id="d0" class="status-dot" style="background: var(--ink3); opacity: .5"></span>VPS00<span id="v0" class="hud-val" style="opacity: .55">--</span></span>
+          <span style="display: flex; gap: 9px; align-items: center"><span id="d1" class="status-dot" style="background: var(--ink3); opacity: .5"></span>VPS01<span id="v1" class="hud-val" style="opacity: .55">--</span></span>
+          <span style="display: flex; gap: 9px; align-items: center"><span id="d2" class="status-dot" style="background: var(--ink3); opacity: .5"></span>VPS02<span id="v2" class="hud-val" style="opacity: .55">--</span></span>
         </div>
         <span style="text-align: right; display: flex; justify-content: flex-end; gap: clamp(10px, 1.8vw, 22px); align-items: center; min-width: 0">
           <span id="replay" class="replay-btn">REPLAY</span>
@@ -670,6 +675,23 @@ class Scene {
       const dot = E[`d${i}`], val = E[`v${i}`];
       if (!dot || !val) return;
       const tap = (900 + i * 150) * k, race = tap + 250 * k, top = race + 400 * k, land = top + 400 * k;
+
+      // Narrow viewport: same tap timing, but collapse the 5-metric readout
+      // to one word — no room for L07 C04 M03 S00 D05 at phone width.
+      if (this.W < 600) {
+        if (t < land) {
+          this.set(val, 'text', 'TAPPING');
+          this.set(val, 'opacity', '.55'); this.set(val, 'color', T.ink3);
+          this.set(dot, 'background', T.ink3); this.set(dot, 'opacity', '.5');
+        } else {
+          const bad = isBad(s);
+          this.set(val, 'text', bad ? 'DNGR' : 'OK');
+          this.set(val, 'opacity', '1'); this.set(val, 'color', bad ? T.badHex : T.okHex);
+          this.set(dot, 'opacity', '1'); this.set(dot, 'background', bad ? T.badHex : T.okHex);
+        }
+        return;
+      }
+
       if (t < race) {
         this.set(val, 'text', t < tap ? '--' : 'TAPPING');
         this.set(val, 'opacity', '.55'); this.set(val, 'color', T.ink3);
