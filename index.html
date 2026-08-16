@@ -731,6 +731,11 @@ class Scene {
       let spans = this._m.get(val);
       if (!spans || val.firstElementChild !== spans[0]) {
         val.textContent = '';
+        // set()'s diff cache doesn't know textContent was just wiped by hand --
+        // without this, resizing wide (spans built, bypassing set()) then back
+        // narrow leaves the 'text' cache entry stale, so set(val,'text','OK')
+        // no-ops and the wide-mode spans stay stuck on screen at phone width.
+        this._w.delete(val);
         spans = METRIC_KEYS.map((_, j) => {
           if (j) val.appendChild(document.createTextNode(' '));
           return val.appendChild(document.createElement('span'));
