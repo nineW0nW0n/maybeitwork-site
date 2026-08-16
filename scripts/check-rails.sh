@@ -46,6 +46,14 @@ awk '/@keyframes/{depth=0; flag=1} flag{print; n=gsub(/\{/,"{"); depth+=n; n=gsu
   && fail "keyframes animate a layout property (width/height/top/left/margin) — rail 4, transform/opacity only" \
   || true
 
+# Security: no markup-writing sinks. The metric readout used to assemble an
+# HTML string and inject it -- safe only because nothing untrusted reached
+# the template, which nothing enforced. It builds real <span>s now. Keep it
+# that way: there is no reason this page ever needs to write markup.
+if grep -vE 'base64' "$FILE" | grep -Eq 'innerHTML|outerHTML|insertAdjacentHTML|document\.write'; then
+  fail "markup-writing sink found (innerHTML/outerHTML/insertAdjacentHTML/document.write) — use textContent and real elements"
+fi
+
 # Rail 7: reduced-motion must be honored somewhere in the file.
 if ! grep -q 'prefers-reduced-motion' "$FILE"; then
   fail "no prefers-reduced-motion handling found (rail 7)"
