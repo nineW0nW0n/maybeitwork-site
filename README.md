@@ -52,8 +52,13 @@ file's inline `<style>`/`<script>`:
 
 ## Deploy
 
-GitHub → Dokploy, behind an existing Cloudflare Tunnel. See the homelab
-repo for the actual pipeline — nothing here should re-derive those rules.
+`maybeit.work` is a Cloudflare Worker (Custom Domain route, no Tunnel/
+Dokploy involved), not this repo. `index.html` here is the design
+source of truth — the homelab repo's `worker/status/` keeps a plain
+committed copy (`src/page.html`) and serves it, plus the `/status.json`
+endpoint this page fetches on load. See that repo's `worker/status/
+CLAUDE.md` for the actual pipeline — nothing here should re-derive those
+rules. Changes here don't auto-deploy; they need re-copying over there.
 
 ---
 
