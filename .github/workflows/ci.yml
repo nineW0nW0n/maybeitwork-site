@@ -67,3 +67,7 @@ jobs:
       - uses: gitleaks/gitleaks-action@ff98106e4c7b2bc287b24eaf42907196329070c7  # v2.3.9
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # The action resolves this binary version itself at runtime if unset
+          # (defaults to a version this plan never pinned) -- pin it explicitly
+          # to match this repo's resolved-2026-08-16 gitleaks binary version.
+          GITLEAKS_VERSION: 8.30.1

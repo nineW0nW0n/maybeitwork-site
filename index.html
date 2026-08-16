@@ -745,6 +745,9 @@ class Scene {
         const v10 = Math.round(n);
         const txt = `${letter}${String(v10).padStart(2, '0')}`;
         if (spans[j].textContent !== txt) spans[j].textContent = txt;
+        // Unconditional write, not routed through set()'s diff cache: applyTheme()
+        // resets _w on a theme change but not _m, so caching this here would miss
+        // the theme toggle repainting these spans' colors.
         spans[j].style.color = v10 <= 0 ? T.ink3 : v10 >= 8 ? T.badHex : T.okHex;
       });
       this.set(val, 'opacity', '1');
