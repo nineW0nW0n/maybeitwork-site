@@ -39,6 +39,14 @@ starting design, theming, or assembly. Don't guess at which skill applies.
 2. **No external runtime requests.** No CDN scripts, no Google Fonts, no
    remote assets. System font stack, or a font inlined into the file.
    The page must render fully with no network beyond its own HTML.
+   **Scoped exception (2026-08-16):** the bottom-bar status row may fire
+   ONE same-origin `GET /status.json` on load, to pick up live status
+   from the homelab's containerized Netdata agents (aggregation happens
+   outside this repo). Timeout ~800ms via `AbortController`; response
+   validated before use; any failure — network, timeout, bad JSON, wrong
+   shape — silently keeps the built-in fallback values. No polling loop,
+   no other endpoint, no third-party host. Don't let this exception
+   justify further network calls elsewhere on the page.
 3. **Animation is DOM elements + CSS.** No video, GIF, or Lottie standing
    in for motion. Movement comes from transforms on real elements.
    **Scoped exception (2026-08-15):** the hero's particle/disc field

@@ -86,7 +86,7 @@ html.js .no-js { display: none !important; }
     <h1 style="font-size: clamp(32px, 8vw, 48px); font-weight: 600; letter-spacing: -.02em; margin: 0; color: var(--ink)">maybeit.work</h1>
     <p style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink3); margin: 0;">it does.</p>
     <ul style="list-style: none; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 16px; padding: 0; margin: 0; font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: .08em; color: var(--ink3);">
-      <li>DOKPLOY</li><li>VPS00</li><li>VPS01</li><li>VPS02</li>
+      <li>VPS00</li><li>VPS01</li><li>VPS02</li>
     </ul>
   </div>
 
@@ -111,16 +111,15 @@ html.js .no-js { display: none !important; }
     <div id="bar" style="position: absolute; left: 0; right: 0; bottom: 0; padding: 0 40px 23px; opacity: 0; text-shadow: var(--hudText); transition: opacity .5s linear">
       <div style="height: 6px; background: repeating-linear-gradient(to right, var(--tick) 0px, var(--tick) 1px, transparent 1px, transparent 48px); margin-bottom: -1px; filter: var(--hudGlow)"></div>
       <div style="height: 1px; background: var(--rule); filter: var(--hudGlow)"></div>
-      <div style="display: grid; grid-template-columns: auto minmax(0,1fr) auto; align-items: center; padding-top: 14px; font-family: 'IBM Plex Mono', monospace; font-size: clamp(9.5px, 1.15vw, 12px); letter-spacing: .1em; color: var(--ink3); font-variant-numeric: tabular-nums">
+      <div style="display: grid; grid-template-columns: auto minmax(0,1fr) auto; align-items: start; padding-top: 14px; font-family: 'IBM Plex Mono', monospace; font-size: clamp(9.5px, 1.15vw, 12px); letter-spacing: .1em; color: var(--ink3); font-variant-numeric: tabular-nums">
         <span style="display: flex; gap: clamp(10px, 1.8vw, 22px); align-items: center; min-width: 0">
           <span id="pct">000%</span>
           <span id="theme-toggle" class="theme-toggle" style="display: flex; gap: 6px; align-items: center; letter-spacing: .12em"><span id="tl" style="opacity: .45">LGT</span><span style="opacity: .28">/</span><span id="td" style="opacity: .45">DRK</span></span>
         </span>
         <div style="display: flex; flex-wrap: wrap; column-gap: clamp(12px, 2.4vw, 34px); row-gap: 4px; align-items: center; justify-content: center; min-width: 0">
-          <span style="display: flex; gap: 9px; align-items: center"><span id="d0" class="status-dot" style="background: var(--ink3); opacity: .5"></span>DOKPLOY<span id="v0" style="opacity: .55; min-width: 5.6em; display: inline-block">UNKWN</span></span>
-          <span style="display: flex; gap: 9px; align-items: center"><span id="d1" class="status-dot" style="background: var(--ink3); opacity: .5"></span>VPS00<span id="v1" style="opacity: .55; min-width: 5.6em; display: inline-block">UNKWN</span></span>
-          <span style="display: flex; gap: 9px; align-items: center"><span id="d2" class="status-dot" style="background: var(--ink3); opacity: .5"></span>VPS01<span id="v2" style="opacity: .55; min-width: 5.6em; display: inline-block">UNKWN</span></span>
-          <span style="display: flex; gap: 9px; align-items: center"><span id="d3" class="status-dot" style="background: var(--ink3); opacity: .5"></span>VPS02<span id="v3" style="opacity: .55; min-width: 5.6em; display: inline-block">UNKWN</span></span>
+          <span style="display: flex; gap: 9px; align-items: center"><span id="d0" class="status-dot" style="background: var(--ink3); opacity: .5"></span>VPS00<span id="v0" style="opacity: .55; min-width: 11.5em; white-space: nowrap; display: inline-block">--</span></span>
+          <span style="display: flex; gap: 9px; align-items: center"><span id="d1" class="status-dot" style="background: var(--ink3); opacity: .5"></span>VPS01<span id="v1" style="opacity: .55; min-width: 11.5em; white-space: nowrap; display: inline-block">--</span></span>
+          <span style="display: flex; gap: 9px; align-items: center"><span id="d2" class="status-dot" style="background: var(--ink3); opacity: .5"></span>VPS02<span id="v2" style="opacity: .55; min-width: 11.5em; white-space: nowrap; display: inline-block">--</span></span>
         </div>
         <span style="text-align: right; display: flex; justify-content: flex-end; gap: clamp(10px, 1.8vw, 22px); align-items: center; min-width: 0">
           <span id="replay" class="replay-btn">REPLAY</span>
@@ -134,31 +133,58 @@ html.js .no-js { display: none !important; }
 
 <script>
 /* ── DATA CONTRACT ────────────────────────────────────────────────────────
- * SERVICES below is staged demo data, not live. Real per-service checks
- * (via Netdata) are being wired up separately — this file doesn't make any
- * network request (rail 2). When that lands, replace the literal with
- * whatever populates it; nothing else here needs to change.
+ * SERVICES below is the fallback. On load, one same-origin GET /status.json
+ * (rail 2 scoped exception) tries to replace it with live status from the
+ * homelab's containerized Netdata agents — aggregation into that endpoint
+ * happens outside this repo. Any failure (offline, timeout, bad JSON, wrong
+ * shape) is swallowed and the fallback below stands, silently.
  *
- * Shape — an array of 2-5 entries, rendered left to right in the bottom bar:
- *   { name: string,   // <= 8 chars, uppercase; longer names crowd at <900px
- *     up:   number,   // uptime percent, 0-100, up to 2 decimals
- *     ok:   boolean } // false paints the dot + value in the bad color
+ * Shape — an array of 1-3 entries (one per VPS span in the HTML), rendered
+ * left to right in the bottom bar:
+ *   { name: string,   // <= 8 chars, uppercase
+ *     load: number,   // 0-100, raw percent (already normalized upstream —
+ *     cpu:  number,   //   e.g. load1/nproc*100 — this file does no per-core math)
+ *     mem:  number,
+ *     swap: number,
+ *     disk: number }
+ * /status.json must return exactly this shape — an array, not an object.
+ * Each raw percent is quantized here (÷10, rounded, clamped) into a 0-10
+ * score for display — see quant() below.
  *
  * States the bar renders, driven by the animation clock, not by data:
- *   UNKWN     before this service's tap beat
- *   TAPPING   during its tap
- *   000.00%   counts up to 100 then settles down to `up`
- *
- * The overall percentage (bottom left) is animation progress, not a data
- * value. The disc color interpolates bad -> ok across the sequence and
- * lands on the status hue; it turns bad only if some service is ok: false.
+ *   --                     before this service's tap beat
+ *   TAPPING                during its tap
+ *   L07 C04 M03 S00 D05    races to 10 then settles to each metric's score
+ * Per-value color: 0 dull/dead, 1-7 green (ok), 8-10 red (bad) — letter and
+ * number share the color. The dot and overall pct (bottom left) go bad if
+ * any metric on that node lands in the 8-10 band.
  * ──────────────────────────────────────────────────────────────────────── */
-const SERVICES = [
-  { name: 'DOKPLOY', up: 99.98, ok: true },
-  { name: 'VPS00', up: 99.95, ok: true },
-  { name: 'VPS01', up: 99.91, ok: true },
-  { name: 'VPS02', up: 99.97, ok: true }
+let SERVICES = [
+  { name: 'VPS00', load: 24, cpu: 18, mem: 41, swap: 0, disk: 63 },
+  { name: 'VPS01', load: 15, cpu: 9, mem: 37, swap: 0, disk: 55 },
+  { name: 'VPS02', load: 33, cpu: 28, mem: 52, swap: 5, disk: 71 }
 ];
+
+// One same-origin fetch, short-timed, fails silent — see DATA CONTRACT above.
+(async () => {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 800);
+  try {
+    const res = await fetch('/status.json', { signal: ctrl.signal });
+    const data = await res.json();
+    const isNum = v => typeof v === 'number';
+    const valid = Array.isArray(data) && data.length >= 1 && data.length <= 3 &&
+      data.every(s => typeof s.name === 'string' &&
+        isNum(s.load) && isNum(s.cpu) && isNum(s.mem) && isNum(s.swap) && isNum(s.disk));
+    if (valid) SERVICES = data;
+  } catch { /* offline, timeout, bad JSON, wrong shape — keep fallback */ }
+  finally { clearTimeout(timer); }
+})();
+
+// Raw percent (0-100) -> 0-10 display score.
+function quant(pct) { return Math.max(0, Math.min(10, Math.round(pct / 10))); }
+const METRIC_KEYS = [['L', 'load'], ['C', 'cpu'], ['M', 'mem'], ['S', 'swap'], ['D', 'disk']];
+function isBad(s) { return METRIC_KEYS.some(([, k]) => quant(s[k]) >= 8); }
 
 // Fixed constants — this build has no live tuning panel, so the prototype's
 // configurable parameters become plain defaults. haloSize/corona at 0.75
@@ -606,7 +632,9 @@ class Scene {
     let m = this._w.get(el); if (!m) { m = {}; this._w.set(el, m); }
     if (m[prop] === v) return;
     m[prop] = v;
-    if (prop === 'text') el.textContent = v; else el.style[prop] = v;
+    if (prop === 'text') el.textContent = v;
+    else if (prop === 'html') el.innerHTML = v;
+    else el.style[prop] = v;
   }
 
   chrome(t, k, B, prog, R) {
@@ -632,7 +660,7 @@ class Scene {
 
     const done = prog >= 1;
     this.set(E.pct, 'text', `${String(Math.round(prog * 100)).padStart(3, '0')}%`);
-    this.set(E.pct, 'color', done ? (SERVICES.some(s => !s.ok) ? T.badHex : T.okHex) : T.ink3);
+    this.set(E.pct, 'color', done ? (SERVICES.some(isBad) ? T.badHex : T.okHex) : T.ink3);
 
     const dark = this.eff() === 'dark';
     this.set(E.tl, 'opacity', dark ? '.45' : '.9');
@@ -643,20 +671,24 @@ class Scene {
       if (!dot || !val) return;
       const tap = (900 + i * 150) * k, race = tap + 250 * k, top = race + 400 * k, land = top + 400 * k;
       if (t < race) {
-        this.set(val, 'text', t < tap ? 'UNKWN' : 'TAPPING');
+        this.set(val, 'text', t < tap ? '--' : 'TAPPING');
         this.set(val, 'opacity', '.55'); this.set(val, 'color', T.ink3);
         this.set(dot, 'background', T.ink3); this.set(dot, 'opacity', '.5');
         return;
       }
-      let n;
-      if (t < top) n = 100 * eo(seg(t, race, top));
-      else n = 100 - (100 - s.up) * eo(seg(t, top, land));
-      const int = Math.floor(n), dec = Math.round((n - int) * 100);
-      this.set(val, 'text', `${String(int).padStart(3, '0')}.${String(dec).padStart(2, '0')}%`);
+      const html = METRIC_KEYS.map(([letter, key]) => {
+        const target = quant(s[key]);
+        let n;
+        if (t < top) n = 10 * eo(seg(t, race, top));
+        else n = 10 - (10 - target) * eo(seg(t, top, land));
+        const v10 = Math.round(n);
+        const color = v10 <= 0 ? T.ink3 : v10 >= 8 ? T.badHex : T.okHex;
+        return `<span style="color:${color}">${letter}${String(v10).padStart(2, '0')}</span>`;
+      }).join(' ');
+      this.set(val, 'html', html);
       this.set(val, 'opacity', '1');
-      this.set(val, 'color', s.ok ? T.ink : T.badHex);
       this.set(dot, 'opacity', '1');
-      this.set(dot, 'background', s.ok ? T.okHex : T.badHex);
+      this.set(dot, 'background', isBad(s) ? T.badHex : T.okHex);
     });
   }
 }
