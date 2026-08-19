@@ -68,6 +68,25 @@ a:hover { color: var(--ink); }
 html:not(.js) .js-only { display: none !important; }
 html.js .no-js { display: none !important; }
 
+/* Backstop for #boot vs #h2: #boot used to carry `transition: opacity .18s
+   linear` (removed from its inline style) so its fade-out could get caught
+   mid-flight — a backgrounded/occluded tab suspends rAF and freezes any
+   in-progress CSS transition at whatever fractional value it had reached,
+   and a later forced repaint (e.g. a screenshot) then composites that
+   frozen partial opacity on top of a #h2 that had already finished
+   settling to 1 in an earlier tick, before the pause. #boot's opacity is
+   now a hard 0/1 flip with no transition, so there is no fractional value
+   to freeze — but this class is a second, stylesheet-level lock behind it:
+   once the boot readout has flipped to 0 for this cycle, !important here
+   beats any stray inline write, so a paused/resumed rAF loop or a
+   theme-toggle cache reset can never leave it re-rendered. start()
+   (initial load and REPLAY) clears the class again so the next boot hold
+   can show. Third layer: a `visibilitychange` listener (see init()) forces
+   an immediate frame() the instant the tab is shown again, so the class
+   and the inline opacity both catch up before the browser gets a chance to
+   paint whatever state was current when the tab was hidden. */
+html.booted #boot { opacity: 0 !important; }
+
 .status-dot { position: relative; width: 6px; height: 6px; border-radius: 50%; }
 .status-dot::before {
   content: ''; position: absolute; inset: -4px; border-radius: 50%;
@@ -123,7 +142,7 @@ html.js .no-js { display: none !important; }
   <div class="js-only">
     <canvas id="cv" style="position: absolute; inset: 0; width: 100%; height: 100%"></canvas>
 
-    <div id="boot" style="position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); display: flex; gap: 8px; align-items: center; font-family: 'IBM Plex Mono', monospace; font-size: 13px; letter-spacing: .22em; color: var(--ink3); text-shadow: var(--hudText); pointer-events: none; transition: opacity .18s linear">TAPPING<span class="blink">_</span></div>
+    <div id="boot" style="position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); display: flex; gap: 8px; align-items: center; font-family: 'IBM Plex Mono', monospace; font-size: 13px; letter-spacing: .08em; color: var(--ink3); text-shadow: var(--hudText); pointer-events: none">TAPPING<span class="blink">_</span></div>
 
     <div id="grain" style="position: absolute; inset: 0; pointer-events: none"></div>
 
@@ -270,6 +289,15 @@ class Scene {
       this._override = this.eff() === 'dark' ? 'light' : 'dark';
       this.applyTheme(); this.grain(); this._frozen = false;
     });
+    // rAF is suspended for the whole time a tab is hidden — if the boot->race
+    // crossover (t=0, see frame()) fell inside that window, the browser can
+    // repaint the pre-hide frame the instant the tab is shown again, up to
+    // one full tick before the next rAF callback would've caught it up. Force
+    // an immediate resync on the visibility edge so that stale paint never
+    // gets a chance to show #boot ghosting over the settled headline.
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) this.frame(performance.now());
+    });
     this.applyTheme();
     this.resize(true);
     this.start();
@@ -373,6 +401,8 @@ class Scene {
       p.eaten = false; p.dead = false; p.fall = false; p.x = p.hx; p.y = p.hy; p.px = p.hx; p.py = p.hy;
     });
     this.set(this.els.bar, 'opacity', '0');
+    // new boot hold starting: drop the stylesheet lock so #boot can show again
+    document.documentElement.classList.remove('booted');
   }
 
   frame(now) {
@@ -380,6 +410,10 @@ class Scene {
     const D = this.dur(), t = now - this.t0;
     if (t < 0) { this.set(this.els.boot, 'opacity', '1'); return; }
     this.set(this.els.boot, 'opacity', '0');
+    // boot has faded once this cycle: lock it out at the stylesheet level (see
+    // html.booted rule) so a paused/resumed rAF loop or a theme-toggle cache
+    // reset can never leave it re-rendered behind the settled headline.
+    document.documentElement.classList.add('booted');
     // settled state still has the infall trickle moving, so hold ~33fps rather than 20
     if (t > D * 1.6) {
       if (now - (this._last || 0) < 30) return;
@@ -683,9 +717,24 @@ class Scene {
     this.set(E.h2, 'transform', `translate(-50%,calc(-50% + ${(6 * (1 - inB)).toFixed(1)}px))`);
 
     // headline scales with the disc while it is still small, and its ceiling scales
-    // with the viewport so it fills the void instead of floating inside it
-    const cap = Math.max(48, Math.min(72, this.W * 0.05));
-    const fs = Math.max(20, Math.min(cap, R * 1.62 / 6.1));
+    // with the viewport so it fills the void instead of floating inside it.
+    // it.does is the shorter string (7 chars vs maybeit.work's 12), so its
+    // own disc-fit divisor is smaller (~3.6 vs 6.1) — same shape as h1's
+    // clamp below, just tuned to its own width. Without this, cap used a
+    // flat 48px floor that ignored the disc entirely: at narrow viewports
+    // (~307px) the disc shrinks to ~138px across but the floor kept the
+    // headline at 152px wide, so its outer letters rendered outside the
+    // disc, in --bg — invisible on light, muddy on dark.
+    // capW's slope (.075) and the 22px floor are tuned so the 320-400px
+    // phone band actually differentiates: at .05 with a 20px floor, capW
+    // (16-20px) never exceeded the floor across that whole band, so every
+    // phone width from 320 to 400 rendered the identical 20px cap. At .075
+    // capW clears the floor by ~360px, and the floor itself moves from 20
+    // to 22 so the true 320px spec minimum sits a touch larger inside the
+    // disc rather than reading as lost in the middle of it.
+    const capW = Math.min(72, this.W * 0.075);
+    const cap = Math.max(22, Math.min(capW, R * 1.62 / 3.6));
+    const fs = Math.max(22, Math.min(cap, R * 1.62 / 6.1));
     this.set(E.h1, 'fontSize', `${fs.toFixed(0)}px`);
     this.set(E.h2, 'fontSize', `${cap.toFixed(0)}px`);
 
