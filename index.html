@@ -329,7 +329,7 @@ const THEMES = {
   dark: {
     dark: true,
     bg: '#191A26', ink: '#EDEDF2', ink3: '#8B90A8', ink3a: [139, 144, 168],
-    disc: '#6E7183', onDisc: '#0E0F16', line: '237,237,242',
+    disc: '#08090F', onDisc: '#EDEDF2', line: '237,237,242',
     ok: [74, 186, 126], bad: [214, 90, 77],
     okHex: '#39AC6F', badHex: '#E8715E',
     grain: 'rgba(237,237,242,0.16)', grainOp: '0.42', halo: 1.4, bloom: 1, dotA: 0.85
@@ -925,9 +925,7 @@ class Scene {
       SERVICES.some(isBad)
         ? `${SERVICES.filter(isBad).map(s => s.name).join(', ')} reporting a problem.`
         : `All ${SERVICES.length} servers operating normally.`);
-    this.set(E.pct, 'text', done
-      ? (down.length === 1 ? `${down[0].name} BAD` : down.length ? `${down.length} BAD` : `${SERVICES.length}/${SERVICES.length} OK`)
-      : `${String(Math.round(prog * 100)).padStart(3, '0')}%`);
+    this.set(E.pct, 'text', `${String(Math.round(prog * 100)).padStart(3, '0')}%`);
     this.set(E.pct, 'color', done ? (down.length ? T.badHex : T.okHex) : T.ink3);
 
     const dark = this.eff() === 'dark';
