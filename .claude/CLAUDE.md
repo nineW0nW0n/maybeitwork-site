@@ -12,8 +12,8 @@ work.
 
 - **What**: `maybeit.work` — a single-page animated landing site. One
   self-contained HTML file, no build step.
-- **Where**: built locally, deployed to the homelab (`vps01` or `vps02`)
-  via Dokploy, behind the existing Cloudflare Tunnel.
+- **Where**: built locally. Served by a Cloudflare Worker that lives in a
+  separate repo; that repo keeps its own committed copy of `index.html`.
 - **When**: active build, non-production. Nothing depends on it. Break it
   freely, revert freely — that's the point.
 - **Why**: learn how Claude Design and Claude Code work together. Craft
@@ -23,7 +23,7 @@ work.
   site should feel like something that knows it might not work and shipped
   anyway. Lean into it; don't explain it.
 - **How**: edit `index.html`, verify in a real browser, commit, deploy
-  through the homelab pipeline.
+  through the serving repo.
 
 ## Read before design work
 
@@ -41,10 +41,10 @@ starting design, theming, or assembly. Don't guess at which skill applies.
    The page must render fully with no network beyond its own HTML.
    **Scoped exception (2026-08-16):** the bottom-bar status row may fire
    ONE same-origin `GET /status.json` on load, to pick up live status
-   from the homelab's containerized Netdata agents (aggregation happens
-   outside this repo). Timeout ~800ms via `AbortController`; response
-   validated before use; any failure — network, timeout, bad JSON, wrong
-   shape — silently keeps the built-in fallback values. No polling loop,
+   from a same-origin aggregator that lives outside this repo. Timeout
+   ~800ms via `AbortController`; response validated before use; any
+   failure — network, timeout, bad JSON, wrong shape — silently keeps the
+   built-in fallback values. No polling loop,
    no other endpoint, no third-party host. Don't let this exception
    justify further network calls elsewhere on the page.
 3. **Animation is DOM elements + CSS.** No video, GIF, or Lottie standing
@@ -77,9 +77,8 @@ starting design, theming, or assembly. Don't guess at which skill applies.
 8. **Mobile is the default viewport.** Design at 375px first, scale up.
 9. **No tracking, no analytics, no forms collecting personal data.** It's
    a learning site; keep the surface clean.
-10. **Deploying inherits the homelab's rails** — `mem_limit`,
-    `network_mode: host` on cloudflared, one tunnel token per node. Read
-    that repo's `CLAUDE.md`; never re-derive those rules here.
+10. **Deploying inherits the serving repo's rails.** Read that repo's
+    `CLAUDE.md`; never re-derive those rules here.
 
 ## The loop
 
@@ -119,7 +118,7 @@ passes ~1500 lines, say so and propose a split; never split silently.
 ## When you're unsure
 
 Ask before: adding any dependency, adding a build step, relaxing the
-single-file constraint, or touching homelab deploy config.
+single-file constraint, or touching deploy config.
 
 Ex is not an engineer. Before a non-trivial change, explain in plain
 terms what and why in 1-3 sentences — before doing it, not after.

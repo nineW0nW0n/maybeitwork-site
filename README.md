@@ -25,9 +25,9 @@ status bar, grain, scanlines — is DOM elements animated with CSS
   freezes; `REPLAY` always overrides it.
 - **No-JS fallback** — plain readable headline + service list if scripts
   fail or are disabled. Nothing waits on JS to become visible.
-- **Status bar** — currently staged demo data (`SITE` / `VPS01` / `VPS02` /
-  `VPS03`). Real checks land later; the page makes zero network requests
-  until then.
+- **Status bar** — one same-origin `GET /status.json` on load, 800ms
+  timeout, response shape-checked. Anything short of a valid answer keeps
+  the built-in placeholder values. That is the page's only network request.
 
 ## Run it
 
@@ -52,13 +52,9 @@ file's inline `<style>`/`<script>`:
 
 ## Deploy
 
-`maybeit.work` is a Cloudflare Worker (Custom Domain route, no Tunnel/
-Dokploy involved), not this repo. `index.html` here is the design
-source of truth — the homelab repo's `worker/status/` keeps a plain
-committed copy (`src/page.html`) and serves it, plus the `/status.json`
-endpoint this page fetches on load. See that repo's `worker/status/
-CLAUDE.md` for the actual pipeline — nothing here should re-derive those
-rules. Changes here don't auto-deploy; they need re-copying over there.
+`maybeit.work` is served by a Cloudflare Worker from a separate repo, which
+keeps its own committed copy of `index.html`. This repo is the design source
+of truth; changes here go live only when copied over there.
 
 ---
 
