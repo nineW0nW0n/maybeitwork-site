@@ -225,7 +225,7 @@ html.narrow .theme-toggle, html.narrow .replay-btn { padding: 14px 14px; margin:
       <div style="position: relative; height: 6px; margin-bottom: -1px; filter: var(--hudGlow); background: repeating-linear-gradient(to right, var(--rule) 0 1px, transparent 1px 200px), repeating-linear-gradient(to right, var(--tick) 0 1px, transparent 1px 40px); background-size: 100% 6px, 100% 3px; background-position: 0 0, 0 3px; background-repeat: no-repeat"><div style="position: absolute; left: 0; bottom: 0; width: 1px; height: 11px; background: var(--rule)"></div><div style="position: absolute; right: 0; bottom: 0; width: 1px; height: 11px; background: var(--rule)"></div></div>
       <div style="height: 1px; background: var(--rule); filter: var(--hudGlow)"></div>
       <div id="bar-row" style="font-family: 'IBM Plex Mono', monospace; letter-spacing: .1em; color: var(--ink3); font-variant-numeric: tabular-nums">
-        <button id="theme-toggle" class="theme-toggle" type="button" aria-pressed="false" aria-label="Switch to dark theme" style="display: flex; gap: 6px; align-items: center; letter-spacing: .12em; font: inherit; color: inherit; background: none; appearance: none; border: 0; cursor: pointer"><span id="tl" style="opacity: .75">LGT</span><span class="sep" style="opacity: .5">/</span><span id="td" style="opacity: .75">DRK</span><svg class="ico ico-flip" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><circle cx="8" cy="8" r="5.2" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M8 2.8 A5.2 5.2 0 0 1 8 13.2 Z" fill="currentColor"/></svg></button>
+        <button id="theme-toggle" class="theme-toggle" type="button" aria-pressed="false" aria-label="Switch to dark theme" style="display: flex; gap: 6px; align-items: center; letter-spacing: .12em; font: inherit; color: inherit; background: none; appearance: none; border: 0; cursor: pointer"><span id="tl" style="opacity: .75">LIGHT</span><span class="sep" style="opacity: .5">/</span><span id="td" style="opacity: .75">DARK</span><svg class="ico ico-flip" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><circle cx="8" cy="8" r="5.2" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M8 2.8 A5.2 5.2 0 0 1 8 13.2 Z" fill="currentColor"/></svg></button>
         <div id="vps-cluster" style="display: flex; flex-wrap: wrap; column-gap: clamp(10px, 1.6vw, 16px); row-gap: 4px; align-items: center; min-width: 0">
           <span style="display: flex; gap: 9px; align-items: baseline"><span id="d0" class="status-dot" style="background: var(--ink3); opacity: .75"></span><span class="nl">VPS00</span><span id="v0" class="hud-val" aria-hidden="true">--</span></span>
           <span style="display: flex; gap: 9px; align-items: baseline"><span id="d1" class="status-dot" style="background: var(--ink3); opacity: .75"></span><span class="nl">VPS01</span><span id="v1" class="hud-val" aria-hidden="true">--</span></span>
@@ -514,11 +514,13 @@ class Scene {
     const g = tb ? parseFloat(getComputedStyle(tb).paddingLeft) : 40;
     const topRule = tb ? tb.getBoundingClientRect().bottom : 60;
     const botRule = this.barTop || this.H;
-    const d = 64; // equal inset from each rule
+    const R = this.discR(), pad = 20;
+    const yTop = Math.max(topRule + pad, this.cy - R);
+    const yBot = Math.min(botRule - pad, this.cy + R);
     for (const [id, sx, sy] of [['ch-tl', 0, 0], ['ch-tr', 1, 0], ['ch-bl', 0, 1], ['ch-br', 1, 1]]) {
       const el = this.els[id]; if (!el) continue;
       el.style.left = `${(sx ? this.W - g : g).toFixed(1)}px`;
-      el.style.top = `${(sy ? botRule - d : topRule + d).toFixed(1)}px`;
+      el.style.top = `${(sy ? yBot : yTop).toFixed(1)}px`;
     }
   }
 
