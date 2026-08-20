@@ -127,14 +127,17 @@ html.narrow .hud-val { min-width: 4.5em; }
   display: grid;
   grid-template-columns: auto auto minmax(0,1fr) auto auto;
   grid-template-areas: "pct theme vps replay st";
-  align-items: start;
+  /* Baseline, not start: the boxed controls carry a border and 3px of padding,
+     so aligning their boxes' top edges left their text sitting lower than the
+     plain labels beside them. Every string in the bar now sits on one line. */
+  align-items: baseline;
   column-gap: clamp(14px, 3.2vw, 32px);
   row-gap: 6px;
   padding-top: 16px;
 }
 #pct { grid-area: pct; }
 #theme-toggle { grid-area: theme; }
-#vps-cluster { grid-area: vps; justify-content: center; }
+#vps-cluster { grid-area: vps; justify-content: center; align-items: baseline; }
 #replay { grid-area: replay; }
 #st-el { grid-area: st; }
 /* Two rows, but each one says something: the aggregate and its three node
@@ -209,9 +212,9 @@ html.narrow #vps-cluster { flex-wrap: nowrap; column-gap: 10px; justify-content:
              stay exactly where they were (rail 4 — this is a static box, never animated). */
           padding: 16px 0; margin: -16px 0"><span id="tl" style="opacity: .75">LGT</span><span style="opacity: .5">/</span><span id="td" style="opacity: .75">DRK</span></button>
         <div id="vps-cluster" style="display: flex; flex-wrap: wrap; column-gap: clamp(10px, 1.6vw, 16px); row-gap: 4px; align-items: center; min-width: 0">
-          <span style="display: flex; gap: 9px; align-items: center"><span id="d0" class="status-dot" style="background: var(--ink3); opacity: .75"></span><span class="nl">VPS00</span><span id="v0" class="hud-val" aria-hidden="true">--</span></span>
-          <span style="display: flex; gap: 9px; align-items: center"><span id="d1" class="status-dot" style="background: var(--ink3); opacity: .75"></span><span class="nl">VPS01</span><span id="v1" class="hud-val" aria-hidden="true">--</span></span>
-          <span style="display: flex; gap: 9px; align-items: center"><span id="d2" class="status-dot" style="background: var(--ink3); opacity: .75"></span><span class="nl">VPS02</span><span id="v2" class="hud-val" aria-hidden="true">--</span></span>
+          <span style="display: flex; gap: 9px; align-items: baseline"><span id="d0" class="status-dot" style="background: var(--ink3); opacity: .75"></span><span class="nl">VPS00</span><span id="v0" class="hud-val" aria-hidden="true">--</span></span>
+          <span style="display: flex; gap: 9px; align-items: baseline"><span id="d1" class="status-dot" style="background: var(--ink3); opacity: .75"></span><span class="nl">VPS01</span><span id="v1" class="hud-val" aria-hidden="true">--</span></span>
+          <span style="display: flex; gap: 9px; align-items: baseline"><span id="d2" class="status-dot" style="background: var(--ink3); opacity: .75"></span><span class="nl">VPS02</span><span id="v2" class="hud-val" aria-hidden="true">--</span></span>
         </div>
         <p id="sr-status" style="position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;margin:0">Three servers are being checked: VPS00, VPS01, VPS02.</p>
         <button id="replay" class="replay-btn" type="button" aria-label="Replay animation" style="justify-self: end; font: inherit; color: inherit; background: none; appearance: none; cursor: pointer; padding: 16px 0; margin: -16px 0"><span>AGAIN</span></button>
