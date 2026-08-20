@@ -4,3 +4,6 @@
 media/
 *.zip
 maybeit-work-design-spec.md
+
+# npx writes an empty lockfile when it runs a local tool; not a dependency
+package-lock.json
