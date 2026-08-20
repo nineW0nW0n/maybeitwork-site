@@ -3,7 +3,11 @@
 # design handoff / reference material — not site source, kept local only
 media/
 *.zip
-maybeit-work-design-spec.md
+*-design-spec.md
+
+# agent working state — never source
+.superpowers/
+.claude/settings.local.json
 
 # npx writes an empty lockfile when it runs a local tool; not a dependency
 package-lock.json
