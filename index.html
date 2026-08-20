@@ -200,7 +200,7 @@ html.narrow #vps-cluster { flex-wrap: nowrap; column-gap: 10px; justify-content:
       <div style="height: 6px; margin-bottom: -1px; filter: var(--hudGlow); background: repeating-linear-gradient(to right, var(--rule) 0 1px, transparent 1px 200px), repeating-linear-gradient(to right, var(--tick) 0 1px, transparent 1px 40px); background-size: 100% 6px, 100% 3px; background-position: 0 0, 0 3px; background-repeat: no-repeat"></div>
       <div style="height: 1px; background: var(--rule); filter: var(--hudGlow)"></div>
       <div id="bar-row" style="font-family: 'IBM Plex Mono', monospace; letter-spacing: .1em; color: var(--ink3); font-variant-numeric: tabular-nums">
-        <span id="pct" aria-hidden="true" style="align-self: center; font-size: 1.5em; letter-spacing: .06em">000%</span>
+        <span id="pct" aria-hidden="true">000%</span>
         <button id="theme-toggle" class="theme-toggle" type="button" aria-pressed="false" aria-label="Switch to dark theme" style="display: flex; gap: 6px; align-items: center; letter-spacing: .12em; font: inherit; color: inherit; background: none; appearance: none; border: 0; cursor: pointer;
           /* Padding grows the tap target to ~44px effective without moving anything: the
              matching negative margin pulls the box back so neighboring grid cells and text
@@ -213,7 +213,7 @@ html.narrow #vps-cluster { flex-wrap: nowrap; column-gap: 10px; justify-content:
         </div>
         <p id="sr-status" style="position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;margin:0">Three servers are being checked: VPS00, VPS01, VPS02.</p>
         <button id="replay" class="replay-btn" type="button" aria-label="Replay animation" style="justify-self: end; font: inherit; color: inherit; background: none; appearance: none; cursor: pointer; padding: 16px 10px; margin: -16px -10px"><span>AGAIN</span></button>
-        <span id="st-el" aria-hidden="true" style="opacity: .78; justify-self: end">NO/SLA</span>
+        <span id="st-el" aria-hidden="true" style="justify-self: end">NO/SLA</span>
       </div>
     </div>
   </main>
