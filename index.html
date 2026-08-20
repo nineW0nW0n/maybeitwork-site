@@ -104,7 +104,7 @@ html.booted #boot { opacity: 0 !important; }
    themes (~3.1:1 dark, ~3.4:1 light against --bg), and is shared with the
    other "dim but legible" chrome below (crosshair ticks, LGT/DRK, REPLAY)
    so there's one opacity value to reason about instead of three. */
-.status-dot { position: relative; width: 6px; height: 6px; border-radius: 50%; }
+.status-dot { position: relative; width: 9px; height: 9px; border-radius: 50%; }
 html.narrow .status-dot { width: 16px; height: 16px; }
 html.narrow .status-dot::before { inset: -6px; filter: blur(6px); }
 .status-dot::before {
@@ -126,8 +126,8 @@ html.narrow .hud-val { min-width: 4.5em; }
 #bar-row {
   font-size: clamp(11px, 1.15vw, 12px);
   display: grid;
-  grid-template-columns: auto auto minmax(0,1fr) auto auto;
-  grid-template-areas: "pct theme vps replay st";
+  grid-template-columns: auto minmax(0,1fr) auto;
+  grid-template-areas: "theme vps replay";
   /* Baseline, not start: the boxed controls carry a border and 3px of padding,
      so aligning their boxes' top edges left their text sitting lower than the
      plain labels beside them. Every string in the bar now sits on one line. */
@@ -136,11 +136,9 @@ html.narrow .hud-val { min-width: 4.5em; }
   row-gap: 6px;
   padding-top: 16px;
 }
-#pct { grid-area: pct; }
 #theme-toggle { grid-area: theme; }
 #vps-cluster { grid-area: vps; justify-content: center; align-items: baseline; }
 #replay { grid-area: replay; }
-#st-el { grid-area: st; }
 /* Two rows, but each one says something: the aggregate and its three node
    lights on top, the two controls beneath. One row overlapped below ~340px
    once the buttons' tap-target padding was counted. */
@@ -151,7 +149,7 @@ html.narrow #bar-row {
   align-items: center;
   gap: clamp(28px, 11vw, 48px);
 }
-html.narrow #st-el, html.narrow #pct, html.narrow .nl, html.narrow .hud-val { display: none; }
+html.narrow .nl, html.narrow .hud-val { display: none; }
 html.narrow #vps-cluster { flex-wrap: nowrap; column-gap: 10px; justify-content: flex-start; }
 
 .replay-btn { cursor: pointer; opacity: 1; letter-spacing: .12em; border: 0; transition: opacity .15s linear; }
@@ -217,11 +215,16 @@ html.narrow .theme-toggle, html.narrow .replay-btn { padding: 14px 14px; margin:
       <div id="h2" aria-hidden="true" style="position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); font-size: 48px; font-weight: 600; letter-spacing: -.035em; line-height: 1.1; color: var(--onDisc); white-space: nowrap; opacity: 0">it.does</div>
     </div>
 
+    <div id="topbar" style="position: absolute; left: 0; right: 0; top: 0; padding: 22px var(--gutter) 0; opacity: 0; text-shadow: var(--hudText); transition: opacity .28s linear">
+      <div id="top-msg" style="font-family: 'IBM Plex Mono', monospace; font-size: clamp(11px, 1.15vw, 12px); letter-spacing: .06em; color: var(--ink3); margin-bottom: 14px">Welcome. Thank you for testing this site. Now go away.</div>
+      <div style="height: 1px; background: var(--rule); filter: var(--hudGlow)"></div>
+      <div style="position: relative; height: 6px; margin-top: -1px; filter: var(--hudGlow); background: repeating-linear-gradient(to right, var(--rule) 0 1px, transparent 1px 200px), repeating-linear-gradient(to right, var(--tick) 0 1px, transparent 1px 40px); background-size: 100% 6px, 100% 3px; background-position: 0 0, 0 0; background-repeat: no-repeat"><div style="position: absolute; left: 0; top: 0; width: 1px; height: 11px; background: var(--rule)"></div><div style="position: absolute; right: 0; top: 0; width: 1px; height: 11px; background: var(--rule)"></div></div>
+    </div>
+
     <div id="bar" style="position: absolute; left: 0; right: 0; bottom: 0; padding: 0 var(--gutter) 24px; opacity: 0; text-shadow: var(--hudText); transition: opacity .28s linear">
       <div style="position: relative; height: 6px; margin-bottom: -1px; filter: var(--hudGlow); background: repeating-linear-gradient(to right, var(--rule) 0 1px, transparent 1px 200px), repeating-linear-gradient(to right, var(--tick) 0 1px, transparent 1px 40px); background-size: 100% 6px, 100% 3px; background-position: 0 0, 0 3px; background-repeat: no-repeat"><div style="position: absolute; left: 0; bottom: 0; width: 1px; height: 11px; background: var(--rule)"></div><div style="position: absolute; right: 0; bottom: 0; width: 1px; height: 11px; background: var(--rule)"></div></div>
       <div style="height: 1px; background: var(--rule); filter: var(--hudGlow)"></div>
       <div id="bar-row" style="font-family: 'IBM Plex Mono', monospace; letter-spacing: .1em; color: var(--ink3); font-variant-numeric: tabular-nums">
-        <span id="pct" aria-hidden="true">000%</span>
         <button id="theme-toggle" class="theme-toggle" type="button" aria-pressed="false" aria-label="Switch to dark theme" style="display: flex; gap: 6px; align-items: center; letter-spacing: .12em; font: inherit; color: inherit; background: none; appearance: none; border: 0; cursor: pointer"><span id="tl" style="opacity: .75">LGT</span><span class="sep" style="opacity: .5">/</span><span id="td" style="opacity: .75">DRK</span><svg class="ico ico-flip" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><circle cx="8" cy="8" r="5.2" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M8 2.8 A5.2 5.2 0 0 1 8 13.2 Z" fill="currentColor"/></svg></button>
         <div id="vps-cluster" style="display: flex; flex-wrap: wrap; column-gap: clamp(10px, 1.6vw, 16px); row-gap: 4px; align-items: center; min-width: 0">
           <span style="display: flex; gap: 9px; align-items: baseline"><span id="d0" class="status-dot" style="background: var(--ink3); opacity: .75"></span><span class="nl">VPS00</span><span id="v0" class="hud-val" aria-hidden="true">--</span></span>
@@ -230,7 +233,6 @@ html.narrow .theme-toggle, html.narrow .replay-btn { padding: 14px 14px; margin:
         </div>
         <p id="sr-status" style="position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;margin:0">Three servers are being checked: VPS00, VPS01, VPS02.</p>
         <button id="replay" class="replay-btn" type="button" aria-label="Replay animation" style="justify-self: end; font: inherit; color: inherit; background: none; appearance: none; cursor: pointer"><span>AGAIN</span><svg class="ico" viewBox="0 0 16 16" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M13.02 6.65 A5.2 5.2 0 1 1 9.35 2.98"/><path d="M7.71 4.20 L10.80 3.37 L8.54 1.11"/></svg></button>
-        <span id="st-el" aria-hidden="true" style="justify-self: end">NO/SLA</span>
       </div>
     </div>
   </main>
@@ -360,7 +362,7 @@ const seg = (t, a, b) => Math.max(0, Math.min(1, (t - a) / (b - a)));
 class Scene {
   constructor() {
     this.els = {};
-    ['cv','scan','grain','boot','h1','h2','hwrap','bar','pct','tl','td','d0','d1','d2','d3','v0','v1','v2','v3','theme-toggle','sr-status','ch-tl','ch-tr','ch-bl','ch-br'].forEach(id => {
+    ['cv','scan','grain','boot','h1','h2','hwrap','bar','topbar','tl','td','d0','d1','d2','d3','v0','v1','v2','v3','theme-toggle','sr-status','ch-tl','ch-tr','ch-bl','ch-br'].forEach(id => {
       this.els[id] = document.getElementById(id);
     });
     this._w = new WeakMap();
@@ -484,7 +486,8 @@ class Scene {
     const bar = this.els.bar;
     this.barTop = bar ? bar.getBoundingClientRect().top : H - 80;
     if (ratio <= 1.3) return H / 2;
-    const topSafe = 40;
+    const tb = this.els.topbar;
+    const topSafe = (tb ? tb.getBoundingClientRect().bottom : 40) + 16;
     const barTop = this.barTop;
     const trueMid = topSafe + (Math.max(topSafe, barTop) - topSafe) * 0.42;
     // Taper the same way the old bias did: fully off at ratio 1.3, fully
@@ -920,6 +923,7 @@ class Scene {
   chrome(t, k, B, prog, R) {
     const E = this.els, T = this.th();
     this.set(E.bar, 'opacity', t > 0 ? '1' : '0');
+    this.set(E.topbar, 'opacity', t > 0 ? '1' : '0');
     // canvas rides the same fade-in as the bar: it was faded to 0 in start()
     // (see there for why), so this brings the new field back in step with
     // the bar rather than snapping to full opacity mid-draw.
@@ -962,8 +966,6 @@ class Scene {
       SERVICES.some(isBad)
         ? `${SERVICES.filter(isBad).map(s => s.name).join(', ')} reporting a problem.`
         : `All ${SERVICES.length} servers operating normally.`);
-    this.set(E.pct, 'text', `${String(Math.round(prog * 100)).padStart(3, '0')}%`);
-    this.set(E.pct, 'color', done ? (down.length ? T.badHex : T.okHex) : T.ink3);
 
     const dark = this.eff() === 'dark';
     this.set(E.tl, 'opacity', dark ? '.78' : '1');
