@@ -514,7 +514,7 @@ class Scene {
     const g = tb ? parseFloat(getComputedStyle(tb).paddingLeft) : 40;
     const topRule = tb ? tb.getBoundingClientRect().bottom : 60;
     const botRule = this.barTop || this.H;
-    const d = 44; // equal inset from each rule
+    const d = 64; // equal inset from each rule
     for (const [id, sx, sy] of [['ch-tl', 0, 0], ['ch-tr', 1, 0], ['ch-bl', 0, 1], ['ch-br', 1, 1]]) {
       const el = this.els[id]; if (!el) continue;
       el.style.left = `${(sx ? this.W - g : g).toFixed(1)}px`;
@@ -579,6 +579,7 @@ class Scene {
 
   start() {
     this._frozen = false;
+    this._falling = 0;
     // an explicit REPLAY always wins over the media query
     this.reduced = !this._force && CFG.motion === 'auto' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     // boot hold: the readout is tapping the endpoints before anything is drawn.
@@ -659,7 +660,7 @@ class Scene {
     // than a replay of the accumulation.
     const idle = t > B.feedEnd && R > 4;
     const flow = CFG.infall;
-    if (idle && flow > 0 && !this.P.some(p => p.fall) && Math.random() < flow * 0.0055 * dt) {
+    if (idle && flow > 0 && this._falling < 5 && Math.random() < flow * 0.0125 * dt) {
       const p = this.P[(Math.random() * this.P.length) | 0];
       if (p && !p.fall && !p.eaten) {
         const d = Math.hypot(p.x - cx, p.y - cy);
@@ -667,6 +668,10 @@ class Scene {
         if (d > R * 1.25 && d < R * 2.5) {
           p.fall = true; p.fr = d; p.fa = Math.atan2(p.y - cy, p.x - cx);
           p.fv = (Math.random() < 0.5 ? -1 : 1) * (13 + Math.random() * 15);
+          // squared, so most are fine threads and the occasional one is a
+          // heavy body dragging in
+          p.fsz = 0.5 + Math.random() ** 2 * 2.6;
+          this._falling++;
         }
       }
     }
@@ -687,13 +692,15 @@ class Scene {
           p.mag = 0.72 + Math.random() ** 3 * 1.75;
           p.hx = q.x; p.hy = q.y; p.near = q.near; p.sz = (1.2 + q.near * 0.8) * p.mag;
           p.x = q.x; p.y = q.y; p.px = q.x; p.py = q.y; p.fall = false;
+          this._falling--;
           continue;
         }
         // brightens as it closes on the horizon
         const close = Math.min(1, R * 2.2 / Math.max(p.fr, 1));
-        const fa2 = (0.10 + 0.26 * close) * (0.66 + p.mag * 0.3) * T.dotA;
+        const fa2 = (0.10 + 0.26 * close) * (0.66 + p.mag * 0.3) * T.dotA
+          * Math.min(1.5, 0.72 + p.fsz * 0.34);
         ctx.strokeStyle = `rgba(${D3},${fa2.toFixed(3)})`;
-        ctx.lineWidth = p.sz * 0.95; ctx.lineCap = 'round';
+        ctx.lineWidth = p.sz * 0.95 * p.fsz; ctx.lineCap = 'round';
         ctx.beginPath(); ctx.moveTo(p.px, p.py); ctx.lineTo(p.x, p.y); ctx.stroke();
         continue;
       }
