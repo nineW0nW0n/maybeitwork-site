@@ -149,7 +149,8 @@ html.narrow #bar-row {
   align-items: center;
   gap: clamp(28px, 11vw, 48px);
 }
-html.narrow .nl, html.narrow .hud-val, html.narrow .wide-only { display: none; }
+html.narrow .nl, html.narrow .hud-val { display: none; }
+@media (max-width: 600px) { .wide-only { display: none; } }
 html.narrow #vps-cluster { flex-wrap: nowrap; column-gap: 10px; justify-content: flex-start; }
 
 .replay-btn { cursor: pointer; opacity: 1; letter-spacing: .12em; border: 0; transition: opacity .15s linear; }
@@ -303,7 +304,7 @@ function isBad(s) { return METRIC_KEYS.some(([, k]) => quant(s[k]) >= 8); }
 // class instead of carrying its own hand-copied `@media (max-width: 600px)`
 // — one number, read in two places, instead of two numbers kept in sync by
 // hand.
-const NARROW_BP = 600;
+const NARROW_BP = 1200;
 
 // Fixed constants — this build has no live tuning panel, so the prototype's
 // configurable parameters become plain defaults. haloSize/corona at 0.75
