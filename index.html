@@ -149,7 +149,7 @@ html.narrow #bar-row {
   align-items: center;
   gap: clamp(28px, 11vw, 48px);
 }
-html.narrow .nl, html.narrow .hud-val { display: none; }
+html.narrow .nl, html.narrow .hud-val, html.narrow .wide-only { display: none; }
 html.narrow #vps-cluster { flex-wrap: nowrap; column-gap: 10px; justify-content: flex-start; }
 
 .replay-btn { cursor: pointer; opacity: 1; letter-spacing: .12em; border: 0; transition: opacity .15s linear; }
@@ -216,7 +216,7 @@ html.narrow .theme-toggle, html.narrow .replay-btn { padding: 14px 14px; margin:
     </div>
 
     <div id="topbar" style="position: absolute; left: 0; right: 0; top: 0; padding: 22px var(--gutter) 0; opacity: 0; text-shadow: var(--hudText); transition: opacity .28s linear">
-      <div id="top-msg" style="font-family: 'IBM Plex Mono', monospace; font-size: clamp(11px, 1.15vw, 12px); letter-spacing: .06em; color: var(--ink3); margin-bottom: 14px">Welcome. Thank you for testing this site. Now go away.</div>
+      <div id="top-msg" style="font-family: 'IBM Plex Mono', monospace; font-size: clamp(11px, 1.15vw, 12px); letter-spacing: .06em; color: var(--ink3); text-align: center; margin-bottom: 14px">Welcome. <span class="wide-only">Thank you for testing this site. </span>Now go away.</div>
       <div style="height: 1px; background: var(--rule); filter: var(--hudGlow)"></div>
       <div style="position: relative; height: 6px; margin-top: -1px; filter: var(--hudGlow); background: repeating-linear-gradient(to right, var(--rule) 0 1px, transparent 1px 200px), repeating-linear-gradient(to right, var(--tick) 0 1px, transparent 1px 40px); background-size: 100% 6px, 100% 3px; background-position: 0 0, 0 0; background-repeat: no-repeat"><div style="position: absolute; left: 0; top: 0; width: 1px; height: 11px; background: var(--rule)"></div><div style="position: absolute; right: 0; top: 0; width: 1px; height: 11px; background: var(--rule)"></div></div>
     </div>
@@ -504,21 +504,21 @@ class Scene {
     return Math.max(22, Math.min(capW, R * 1.62 / 3.7));
   }
 
-  // The four registration marks sit on a square centred on the disc, so the
-  // frame belongs to the black hole rather than to the browser window. The
-  // square is the largest that clears the gutters, the top edge and the bar,
-  // capped so it hugs the disc on a wide screen and floored so a mark can
-  // never land on the horizon itself. Static placement, once per resize.
+  // The four marks sit at the corners of the band the two rules bound: on the
+  // same gutter the rules terminate on, and the same distance in from each of
+  // them. Placed here rather than in CSS because the inset depends on where
+  // the two rules actually landed, which depends on the message's wrapped
+  // height and on the bar's row count.
   placeMarks() {
-    const R = this.discR(), cx = this.W / 2, cy = this.cy;
-    const g = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--gutter')) || 40;
-    const fit = Math.min(cx - g - 8, cy - 40, (this.barTop || this.H) - 16 - cy);
-    const clear = (R + 22) / Math.SQRT2; // corner stays >=22px outside the horizon
-    const s = Math.max(clear, Math.min(fit, R * 1.45));
-    for (const [id, sx, sy] of [['ch-tl', -1, -1], ['ch-tr', 1, -1], ['ch-bl', -1, 1], ['ch-br', 1, 1]]) {
+    const tb = this.els.topbar;
+    const g = tb ? parseFloat(getComputedStyle(tb).paddingLeft) : 40;
+    const topRule = tb ? tb.getBoundingClientRect().bottom : 60;
+    const botRule = this.barTop || this.H;
+    const d = 44; // equal inset from each rule
+    for (const [id, sx, sy] of [['ch-tl', 0, 0], ['ch-tr', 1, 0], ['ch-bl', 0, 1], ['ch-br', 1, 1]]) {
       const el = this.els[id]; if (!el) continue;
-      el.style.left = `${(cx + sx * s).toFixed(1)}px`;
-      el.style.top = `${(cy + sy * s).toFixed(1)}px`;
+      el.style.left = `${(sx ? this.W - g : g).toFixed(1)}px`;
+      el.style.top = `${(sy ? botRule - d : topRule + d).toFixed(1)}px`;
     }
   }
 
